@@ -27,9 +27,10 @@
 
   .frame-wrap{display:flex;justify-content:center;}
   #frame{width:360px;height:640px;background:radial-gradient(120% 90% at 50% 0%,#0C1626 0%,#020304 72%);
-    position:relative;overflow:hidden;border-radius:8px;box-shadow:0 24px 60px -20px rgba(0,0,0,.8);flex:none;}
+    position:relative;overflow:hidden;border-radius:8px;box-shadow:0 24px 60px -20px rgba(0,0,0,.8);flex:none;
+    display:flex;flex-direction:column;justify-content:center;}
 
-  #card{width:320px;margin:calc(var(--voffset) * 1px) auto 0;
+  #card{width:320px;margin:0 auto;transform:translateY(calc(var(--voffset) * 1px));
     background:var(--panel);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
   .card-head{padding:26px 22px 22px;border-bottom:1px solid var(--border);}
   .head-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
@@ -49,7 +50,7 @@
     letter-spacing:.02em;color:var(--text);margin-top:12px;}
   .subline b{color:var(--glow);}
   .seat-total{font-family:'Work Sans',sans-serif;font-size:15px;color:var(--text-dim);margin-top:12px;
-    font-variant-numeric:tabular-nums;}
+    letter-spacing:.08em;font-variant-numeric:tabular-nums;}
   .seat-total b{color:var(--glow);font-weight:700;font-size:22px;text-shadow:0 0 8px rgba(34,197,94,.5);}
 
   .grid{display:grid;grid-template-columns:repeat(2, calc(var(--cellw) * 1px));justify-content:center;
@@ -142,7 +143,7 @@
     <button class="save-btn" id="saveBtn">コピーしてInstagramを開く</button>
     <p class="save-status" id="saveStatus"></p>
     <button class="reset-btn" id="resetBtn">全席を空席にリセット</button>
-    <p class="controls-note">タップすると、ストーリーズと同じ比率(9:16)の画像がクリップボードにコピーされ、Instagramが開きます。ストーリーズの画面で貼り付けてください。</p>
+    <p class="controls-note">タップすると、ストーリーズと同じ比率(9:16)の画像がクリップボードにコピーされ、Instagramが開きます。「Aa」→テキスト欄を長押し→「ペースト」で画像を貼り付けてください。</p>
   </div>
 </div>
 
