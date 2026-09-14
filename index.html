@@ -301,6 +301,35 @@
     {name:'カウンター6', state:'open'}
   ];
 
+  // ---- 店頭デモ中の入力(店名・電話番号・席・デザイン)をlocalStorageに保存し、
+  // 誤ってページを閉じ直しても復元する ----
+  var STORAGE_KEY = 'imaaki_bar_demo_v1';
+  function saveState(){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        venueName: document.getElementById('venueName').textContent,
+        tel: document.getElementById('telValue').textContent,
+        theme: document.body.dataset.theme,
+        seats: SEATS
+      }));
+    } catch (e) {}
+  }
+  function loadState(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      if (data && Array.isArray(data.seats) && data.seats.length > 0) return data;
+      return null;
+    } catch (e) { return null; }
+  }
+  var savedState = loadState();
+  if (savedState) {
+    SEATS = savedState.seats.slice(0, MAX_SEATS).map(function(s){
+      return { name: String(s && s.name || '席'), state: (s && s.state === 'used') ? 'used' : 'open' };
+    });
+  }
+
   var frame = document.getElementById('frame');
   var body = document.body;
   var grid = document.getElementById('grid');
@@ -334,6 +363,7 @@
         seat.state = (seat.state === 'open') ? 'used' : 'open';
         renderGrid();
         updateSeatTotal();
+        saveState();
       });
       grid.appendChild(cell);
     });
@@ -357,6 +387,7 @@
       input.addEventListener('input', function(){
         seat.name = input.value || ('席' + (idx + 1));
         renderGrid();
+        saveState();
       });
       var removeBtn = document.createElement('button');
       removeBtn.type = 'button';
@@ -369,6 +400,7 @@
         renderSeatEditor();
         renderGrid();
         updateSeatTotal();
+        saveState();
       });
       row.appendChild(input);
       row.appendChild(removeBtn);
@@ -383,6 +415,7 @@
     renderSeatEditor();
     renderGrid();
     updateSeatTotal();
+    saveState();
   });
 
   function tick(){
@@ -396,17 +429,22 @@
     SEATS.forEach(function(s){ s.state = 'open'; });
     renderGrid();
     updateSeatTotal();
+    saveState();
   });
 
   // ---- デモ設定: 店名・電話番号 ----
   var venueNameEl = document.getElementById('venueName');
-  document.getElementById('inputVenueName').addEventListener('input', function(e){
+  var inputVenueName = document.getElementById('inputVenueName');
+  inputVenueName.addEventListener('input', function(e){
     venueNameEl.textContent = e.target.value || 'BAR IMAAKI';
     alignSubline();
+    saveState();
   });
   var telValueEl = document.getElementById('telValue');
-  document.getElementById('inputTel').addEventListener('input', function(e){
+  var inputTel = document.getElementById('inputTel');
+  inputTel.addEventListener('input', function(e){
     telValueEl.textContent = e.target.value || '000-0000-0000';
+    saveState();
   });
 
   // ---- デモ設定: デザインパターン切り替え ----
@@ -416,8 +454,25 @@
       body.dataset.theme = btn.dataset.theme;
       themeButtons.forEach(function(b){ b.classList.toggle('is-active', b === btn); });
       alignSubline();
+      saveState();
     });
   });
+
+  // ---- 保存済みの店名・電話番号・デザインを復元 ----
+  if (savedState) {
+    if (savedState.venueName) {
+      venueNameEl.textContent = savedState.venueName;
+      inputVenueName.value = savedState.venueName;
+    }
+    if (savedState.tel) {
+      telValueEl.textContent = savedState.tel;
+      inputTel.value = savedState.tel;
+    }
+    if (savedState.theme) {
+      body.dataset.theme = savedState.theme;
+      themeButtons.forEach(function(b){ b.classList.toggle('is-active', b.dataset.theme === savedState.theme); });
+    }
+  }
 
   // ---- デモ設定パネルの開閉マーク ----
   document.getElementById('settingsPanel').addEventListener('toggle', function(e){
