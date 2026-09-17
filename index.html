@@ -517,12 +517,15 @@
       ]).then(function(){
         if (isIOS) {
           saveStatus.textContent = 'コピーしました。Instagramを開いています...';
-          setTimeout(function(){ window.location.href = 'instagram://story-camera'; }, 300);
+          // 画像が重い(通常版=不透明フレーム全体)場合、クリップボードへの実書き込みが
+          // 完了しきる前にアプリ切り替えでSafariがバックグラウンド化され、
+          // コピーが中断されることがあるため、余裕を持った待機時間にしている。
+          setTimeout(function(){ window.location.href = 'instagram://story-camera'; }, 800);
         } else if (isAndroid) {
           saveStatus.textContent = 'コピーしました。Instagramを開いています...';
           setTimeout(function(){
             window.location.href = 'intent://story-camera#Intent;package=com.instagram.android;scheme=instagram;end';
-          }, 300);
+          }, 800);
         } else {
           saveStatus.textContent = 'クリップボードにコピーしました。Instagramに貼り付けてください';
         }
