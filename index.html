@@ -282,11 +282,11 @@
   </details>
 
   <div class="controls">
-    <button class="save-btn" id="saveBtn">画像をコピー</button>
+    <button class="save-btn" id="saveBtn">コピーしてInstagramを開く</button>
     <button class="save-btn-overlay" id="saveBtnOverlay">動画に重ねる用にコピー</button>
     <p class="save-status" id="saveStatus"></p>
     <button class="reset-btn" id="resetBtn">全席を空席にリセット</button>
-    <p class="controls-note">タップすると、ストーリーズと同じ比率(9:16)の画像がクリップボードにコピーされます。Instagramを開き、ストーリーズ作成画面の何もない場所を長押しすると出てくる「ペースト」で画像を貼り付けてください(テキストツールの中では貼り付けできません)。<br>「動画に重ねる用にコピー」は背景を透過して書き出すので、自店の動画やブーメランの上に重ねて使えます。</p>
+    <p class="controls-note">タップすると、ストーリーズと同じ比率(9:16)の画像がクリップボードにコピーされ、Instagramが開きます。「Aa」→テキスト欄を長押し→「ペースト」で画像を貼り付けてください。<br>「動画に重ねる用にコピー」は背景を透過して書き出すので、自店の動画やブーメランの上に重ねて使えます。</p>
   </div>
 </div>
 
@@ -515,11 +515,17 @@
       navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blobPromise })
       ]).then(function(){
-        // instagram://story-camera 等のURLスキームは、通常のストーリーズ作成画面ではなく
-        // テキスト入力モードへ直接遷移することがあり、その画面では画像のペーストができない。
-        // そのため自動でInstagramを開くのはやめ、手動で切り替えてもらう。
-        if (isIOS || isAndroid) {
-          saveStatus.textContent = 'コピーしました。Instagramを開いて、ストーリーズ画面の何もない場所を長押し→「ペースト」で貼り付けてください';
+        if (isIOS) {
+          saveStatus.textContent = 'コピーしました。Instagramを開いています...';
+          // 画像が重い(通常版=不透明フレーム全体)場合、クリップボードへの実書き込みが
+          // 完了しきる前にアプリ切り替えでSafariがバックグラウンド化され、
+          // コピーが中断されることがあるため、余裕を持った待機時間にしている。
+          setTimeout(function(){ window.location.href = 'instagram://story-camera'; }, 800);
+        } else if (isAndroid) {
+          saveStatus.textContent = 'コピーしました。Instagramを開いています...';
+          setTimeout(function(){
+            window.location.href = 'intent://story-camera#Intent;package=com.instagram.android;scheme=instagram;end';
+          }, 800);
         } else {
           saveStatus.textContent = 'クリップボードにコピーしました。Instagramに貼り付けてください';
         }
