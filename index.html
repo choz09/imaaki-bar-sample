@@ -540,9 +540,11 @@
     // ---- クリップボードコピー方式(オーバーレイ版、およびWeb Share非対応環境向け) ----
     function copyToClipboard(){
       if (navigator.clipboard && window.ClipboardItem) {
-        return blobPromise.then(function(blob){
-          return navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
-        }).then(function(){
+        // Safari対策: write()自体はユーザー操作の直後に同期的に呼び出す必要があるため、
+        // 画像がまだ生成中でもPromiseのまま渡す(生成完了を待ってから呼ぶとブロックされることがある)。
+        return navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blobPromise })
+        ]).then(function(){
           if (isIOS) {
             saveStatus.textContent = 'コピーしました。Instagramを開いています...';
             // 画像が重い(通常版=不透明フレーム全体)場合、クリップボードへの実書き込みが
